@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Boa noite, meu bem</title>
+<script>document.documentElement.className += ' js';</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Caveat:wght@600&display=swap" rel="stylesheet">
 <style>
@@ -285,6 +286,16 @@
   .som:focus-visible { outline: 3px solid var(--rosa); outline-offset: 2px; }
   .som.desligada { opacity: .6; }
 
+
+  /* Aviso de prévia: some quando o código roda (prévias do iPhone não rodam JavaScript) */
+  .aviso-previa {
+    width: 100%; margin-top: 18px; padding: 14px 16px; border-radius: 16px; text-align: left;
+    background: rgba(255, 255, 255, .08); border: 2px solid var(--rosa); color: var(--texto);
+    font-size: 15px; line-height: 1.5;
+  }
+  .aviso-previa strong { color: var(--rosa); }
+  html.js .aviso-previa { display: none; }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .01s !important; animation-iteration-count: 1 !important; transition: none !important; }
   }
@@ -315,6 +326,10 @@
     </div>
     <button class="botao" id="apagar">Apagar a luz</button>
     <div class="dica">liga o som, que tem musiquinha de ninar 🎶</div>
+    <div class="aviso-previa" role="note">
+      <strong>Abriu só uma prévia.</strong> Assim os botões e a música não funcionam.
+      Toca em Compartilhar e escolhe <strong>Abrir no Safari</strong> (ou no Chrome), que aí funciona tudo. 💜
+    </div>
   </section>
 
   <!-- Tela 2 -->
@@ -579,7 +594,7 @@ var musica = (function () {
     apagou = true;
     var abajur = document.getElementById('abajur');
     abajur.classList.add('puxou');
-    musica.iniciar();
+    try { musica.iniciar(); } catch (erro) { /* sem som, mas a surpresa continua */ }
     setTimeout(function () { document.body.classList.add('escuro'); }, 250);
     setTimeout(cadente, 1400);
     setTimeout(function () { mostrar(t1, t2); }, 2300);
