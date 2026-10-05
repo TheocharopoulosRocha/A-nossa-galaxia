@@ -197,11 +197,37 @@
   .sono-barra { margin-top: 6px; height: 8px; border-radius: 6px; background: rgba(255, 255, 255, .1); overflow: hidden; }
   .sono-barra span { display: block; height: 100%; width: 0; border-radius: 6px; background: linear-gradient(90deg, var(--lilas), var(--rosa)); transition: width .8s ease; }
 
-  .recados { padding: 14px 18px 4px; display: flex; flex-direction: column; gap: 12px; }
-  .recado {
-    background: var(--papel); color: var(--tinta); border-radius: 18px; padding: 14px 16px; text-align: left;
-    animation: surgir .5s cubic-bezier(.2, .8, .2, 1);
+  /* Montinho de recados: o mais novo fica por cima e os anteriores aparecem pela borda */
+  .recados {
+    display: grid; margin: 16px 18px 0; padding-top: 54px;
+    touch-action: pan-y; user-select: none; -webkit-user-select: none;
   }
+  .recados:empty { display: none; }
+  .recado {
+    grid-area: 1 / 1; align-self: start; min-height: var(--alt, 0px);
+    background: var(--papel); color: var(--tinta); border-radius: 18px; padding: 14px 16px; text-align: left;
+    box-shadow: 0 10px 24px -10px rgba(5, 3, 20, .55);
+    transform-origin: 50% 0;
+    transition: transform .55s cubic-bezier(.2, .8, .2, 1), opacity .45s ease, filter .45s ease;
+  }
+  .recado.atras { filter: brightness(.86) saturate(.85); }
+  .recado.atras .texto { opacity: .5; }
+  .recado .texto { transition: opacity .45s ease; }
+  .recado.chegando { transform: translateY(-46px) scale(1.06) rotate(-3deg) !important; opacity: 0 !important; transition: none; }
+
+  .folhear {
+    display: none; align-items: center; justify-content: center; gap: 14px; margin-top: 14px;
+  }
+  .folhear.visivel { display: flex; animation: surgir .5s ease; }
+  .seta {
+    width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .22); cursor: pointer;
+    background: rgba(255, 255, 255, .08); color: var(--texto); font: 600 20px/1 'Fredoka', system-ui, sans-serif;
+  }
+  .seta:disabled { opacity: .3; cursor: default; }
+  .seta:focus-visible { outline: 3px solid var(--rosa); outline-offset: 2px; }
+  .folhear-num { min-width: 64px; font-size: 14px; color: var(--texto-suave); font-variant-numeric: tabular-nums; }
+  .folhear-dica { font-size: 12px; color: var(--texto-suave); opacity: .8; margin-top: 6px; display: none; }
+  .folhear-dica.visivel { display: block; }
   .recado .rotulo { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--rosa-escuro); }
   .recado .texto { font-size: 17px; line-height: 1.45; margin-top: 4px; }
 
@@ -309,6 +335,12 @@
         <div class="sono-barra"><span id="sono-barra"></span></div>
       </div>
       <div class="recados" id="recados" aria-live="polite"></div>
+      <div class="folhear" id="folhear">
+        <button class="seta" id="ant" type="button" aria-label="Recado anterior">‹</button>
+        <span class="folhear-num" id="folhear-num"></span>
+        <button class="seta" id="prox" type="button" aria-label="Próximo recado">›</button>
+      </div>
+      <div class="folhear-dica" id="folhear-dica">deslize pro lado ou use as setinhas pra reler</div>
       <div class="rodape-painel">
         <button class="botao" id="carneiro">Chamar um carneirinho</button>
         <div class="contador" id="contador">Nenhum carneirinho ainda</div>
@@ -476,13 +508,13 @@ var musica = (function () {
 (function () {
   // Recadinhos que cada carneirinho traz. Pode trocar os textos à vontade.
   var RECADOS = [
-    'Você foi incrível hoje, até nas partes que pareceram difíceis.',
+    'A cada dia que passa vejo o quão incrível e dedicada você é, até nas partes que pareciam difíceis.',
     'O que ficou pendente pode esperar até amanhã. Agora é só descanso.',
-    'Se eu pudesse, estaria aí ajeitando a sua coberta.',
-    'O Nikinho mandou avisar que dormir é a coisa mais importante do mundo. Ele é especialista.',
-    'Bebe um copinho d’água antes de deitar. Cuidando de você até de longe.',
+    'Se eu pudesse, estaria aí pronto pra gente dormir bem muitão.',
+    'O Nikinho mandou avisar que dormir é a coisa mais importante do mundo. Ele é especialista. 😴',
+    'Bebe um copinho d’água antes de deitar. Cuidando de você até de longe. 🥰',
     'Amanhã cedo tem bom dia meu esperando você. Prometo.',
-    'Eu tô pensando em você agora. E é bem capaz de sonhar com você também.'
+    'Pode ter certeza que tô pensando em você agora. E é bem capaz de sonhar com você também.'
   ];
   var NIVEIS = ['bem acordada 👀', 'relaxando 😌', 'bocejando 🥱', 'olhinho pesando 😪', 'quase lá 😴', 'sonhando 💤'];
 
@@ -580,17 +612,105 @@ var musica = (function () {
       : 'Todos os carneirinhos pularam. Mas tem mais uma coisinha…';
   }
 
+  /* ---- Montinho de recados ---- */
+  var cartas = [], atual = -1, podeFolhear = false;
+  var giros = [-2.2, 1.6, -1.2, 2, -1.8, 1.2, -1.5];
+  var folhear = document.getElementById('folhear'), fNum = document.getElementById('folhear-num');
+  var bAnt = document.getElementById('ant'), bProx = document.getElementById('prox');
+
+  function arrumar() {
+    cartas.forEach(function (el, i) {
+      var d = atual - i; // 0 = carta de cima
+      if (d < 0) {        // já folheada: sai pro lado
+        el.style.transform = 'translateX(115%) rotate(8deg)';
+        el.style.opacity = '0';
+        el.style.zIndex = 50 + i;
+        el.classList.remove('atras');
+        el.setAttribute('aria-hidden', 'true');
+        return;
+      }
+      var vis = Math.min(d, 3);
+      el.style.transform = 'translateY(' + (-vis * 17) + 'px) scale(' + (1 - vis * .04) + ') rotate(' + (d === 0 ? 0 : giros[i % giros.length]) + 'deg)';
+      el.style.opacity = d > 3 ? '0' : '1';
+      el.style.zIndex = 10 + i;
+      el.classList.toggle('atras', d > 0);
+      el.setAttribute('aria-hidden', d === 0 ? 'false' : 'true');
+    });
+    if (podeFolhear) {
+      fNum.textContent = (atual + 1) + ' de ' + cartas.length;
+      bAnt.disabled = atual <= 0;
+      bProx.disabled = atual >= cartas.length - 1;
+    }
+  }
+
+  function irPara(n) {
+    if (!podeFolhear) return;
+    n = Math.max(0, Math.min(cartas.length - 1, n));
+    if (n === atual) return;
+    atual = n;
+    arrumar();
+  }
+  bAnt.addEventListener('click', function () { irPara(atual - 1); });
+  bProx.addEventListener('click', function () { irPara(atual + 1); });
+
+  // deslizar o dedo pro lado folheia
+  var x0 = null;
+  lista.addEventListener('pointerdown', function (e) { x0 = e.clientX; });
+  lista.addEventListener('pointerup', function (e) {
+    if (x0 === null) return;
+    var dx = e.clientX - x0; x0 = null;
+    if (Math.abs(dx) < 40) return;
+    irPara(atual + (dx > 0 ? -1 : 1));
+  });
+  lista.addEventListener('pointercancel', function () { x0 = null; });
+  document.addEventListener('keydown', function (e) {
+    if (!podeFolhear || !t2.classList.contains('ativa')) return;
+    if (e.key === 'ArrowLeft') irPara(atual - 1);
+    if (e.key === 'ArrowRight') irPara(atual + 1);
+  });
+
+  // todas as cartinhas com a mesma altura (a do recado mais longo),
+  // assim as de trás sempre aparecem pela borda de cima e nada sobra embaixo
+  function igualarAlturas() {
+    var largura = lista.clientWidth;
+    if (!largura) return;
+    var maior = 0;
+    RECADOS.forEach(function (txt, i) {
+      var p = document.createElement('article');
+      p.className = 'recado';
+      p.style.cssText = 'position:absolute;visibility:hidden;min-height:0;width:' + largura + 'px';
+      p.innerHTML = '<div class="rotulo">🐑 Carneirinho nº ' + (i + 1) + '</div><div class="texto"></div>';
+      p.querySelector('.texto').textContent = txt;
+      document.body.appendChild(p);
+      maior = Math.max(maior, p.offsetHeight);
+      p.remove();
+    });
+    lista.style.setProperty('--alt', maior + 'px');
+  }
+  addEventListener('resize', igualarAlturas);
+
   function adicionarRecado() {
     var el = document.createElement('article');
-    el.className = 'recado';
+    el.className = 'recado chegando';
     el.innerHTML = '<div class="rotulo"></div><div class="texto"></div>';
     el.querySelector('.rotulo').textContent = '🐑 Carneirinho nº ' + (indice + 1);
     el.querySelector('.texto').textContent = RECADOS[indice];
     lista.appendChild(el);
+    if (!cartas.length) igualarAlturas();
+    cartas.push(el);
+    atual = cartas.length - 1;
+    void el.offsetWidth;                 // garante que a animação de "cair" no montinho aconteça
+    el.classList.remove('chegando');
+    arrumar();
     indice++;
     atualizar();
-    if (indice === RECADOS.length) botao.textContent = 'Tem mais uma coisinha →';
-    setTimeout(function () { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 60);
+    if (indice === RECADOS.length) {
+      botao.textContent = 'Tem mais uma coisinha →';
+      podeFolhear = true;
+      folhear.classList.add('visivel');
+      document.getElementById('folhear-dica').classList.add('visivel');
+      arrumar();
+    }
   }
 
   botao.addEventListener('click', function () {
@@ -619,7 +739,7 @@ var musica = (function () {
 
   /* toque no céu solta brilhinhos depois que a luz apaga */
   addEventListener('pointerdown', function (e) {
-    if (!apagou || (e.target.closest && e.target.closest('button, .cupom, .recado, [role=button]'))) return;
+    if (!apagou || (e.target.closest && e.target.closest('button, .cupom, .recados, [role=button]'))) return;
     brilhinhos(e.clientX, e.clientY, 3);
   }, { passive: true });
 })();
