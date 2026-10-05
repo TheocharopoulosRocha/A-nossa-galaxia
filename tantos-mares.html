@@ -293,6 +293,98 @@ html.js .nojs-only{display:none!important}
 })();
 </script>
 
+<!-- ===== Animação do envelope abrindo (Nosso Cantinho) ===== -->
+<style>
+/* a página não pula quando o envelope vira carta */
+html{overflow-anchor:none}
+.envelope.abrindo{overflow:visible;cursor:default}
+.envelope .nc-bolso,.envelope .nc-aba,.envelope .nc-papel{position:absolute;pointer-events:none}
+/* bolso da frente: esconde a parte de baixo do papel enquanto ele sai */
+.envelope .nc-bolso{inset:0;border-radius:14px;z-index:2;background:var(--rosa-claro);
+  clip-path:polygon(0 38%,50% 72%,100% 38%,100% 100%,0 100%);
+  box-shadow:inset 0 -1px 0 rgba(155,123,234,.25)}
+/* aba de cima, que gira pra abrir */
+.envelope .nc-aba{left:0;right:0;top:0;height:58%;z-index:3;transform-origin:50% 0;
+  background:linear-gradient(180deg,#ffc2df,#ffb3d6);
+  clip-path:polygon(0 0,100% 0,50% 100%);border-radius:14px 14px 0 0}
+/* o papel da carta guardado lá dentro */
+.envelope .nc-papel{left:9%;right:9%;top:16%;height:76%;z-index:1;border-radius:6px;
+  background:var(--papel);box-shadow:0 6px 18px -8px rgba(74,44,94,.45);
+  background-image:repeating-linear-gradient(transparent 0 15px, rgba(155,123,234,.22) 15px 16px);background-position:0 18px}
+.envelope .selo{z-index:4}
+.envelope .dica{z-index:4;transition:opacity .3s ease}
+
+.envelope.abrindo .selo{animation:nc-selo .45s ease-in forwards}
+.envelope.abrindo .dica{opacity:0}
+.envelope.abrindo .nc-aba{animation:nc-aba .7s .3s cubic-bezier(.45,.05,.3,1) forwards}
+.envelope.abrindo .nc-papel{animation:nc-papel .75s .85s cubic-bezier(.2,.8,.25,1) forwards}
+
+@keyframes nc-selo{
+  40%{transform:translate(-50%,-50%) scale(1.18) rotate(-10deg)}
+  100%{transform:translate(-50%,-50%) scale(.2) rotate(25deg);opacity:0}
+}
+@keyframes nc-aba{
+  0%{transform:perspective(700px) rotateX(0deg);z-index:3}
+  49%{z-index:3}
+  50%{z-index:0}
+  100%{transform:perspective(700px) rotateX(180deg);z-index:0;filter:brightness(.92)}
+}
+@keyframes nc-papel{
+  0%{transform:translateY(0)}
+  100%{transform:translateY(-62%)}
+}
+
+/* a carta se desdobra a partir do mesmo lugar onde estava o envelope */
+.carta.nc-desdobrar{animation:nc-desdobrar .85s cubic-bezier(.2,.85,.25,1) both;transform-origin:50% 0}
+@keyframes nc-desdobrar{
+  0%{opacity:0;transform:perspective(900px) rotateX(-65deg) scaleY(.4)}
+  60%{opacity:1}
+  100%{opacity:1;transform:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .envelope.abrindo .selo,.envelope.abrindo .nc-aba,.envelope.abrindo .nc-papel,.carta.nc-desdobrar{animation-duration:.01s;animation-delay:0s}
+}
+</style>
+<script>
+(function(){
+  var env = document.getElementById('envelope');
+  var chk = document.getElementById('abrir');
+  var carta = document.getElementById('carta');
+  if (!env || !chk || !carta) return;
+
+  ['nc-papel','nc-bolso','nc-aba'].forEach(function(cls){
+    var s = document.createElement('span'); s.className = cls; s.setAttribute('aria-hidden','true');
+    env.insertBefore(s, env.firstChild);
+  });
+
+  var calmo = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var abrindo = false;
+
+  function abrir(){
+    if (abrindo || chk.checked) return;
+    abrindo = true;
+    env.classList.add('abrindo');
+    setTimeout(revelar, calmo ? 50 : 1650);
+  }
+
+  function revelar(){
+    var topoAntes = env.getBoundingClientRect().top;
+    carta.classList.add('nc-desdobrar');
+    chk.checked = true;                       // o CSS original troca o envelope pela carta
+    // segura a tela no lugar: a carta começa exatamente onde estava o envelope
+    var diferenca = carta.getBoundingClientRect().top - topoAntes;
+    if (Math.abs(diferenca) > 1) window.scrollBy(0, diferenca);
+    chk.dispatchEvent(new Event('change'));   // dispara os coraçõezinhos da página
+  }
+
+  // clique/toque no envelope: anima em vez de marcar a caixa na hora (e sem a tela pular)
+  env.addEventListener('click', function(e){ e.preventDefault(); abrir(); });
+  // teclado (Enter/Espaço na caixinha escondida)
+  chk.addEventListener('click', function(e){ if (!abrindo) { e.preventDefault(); abrir(); } });
+})();
+</script>
+<!-- ===== fim da animação do envelope ===== -->
+
 <!-- ===== Navegação do Nosso Cantinho (adicionada automaticamente) ===== -->
 <div id="nc-nav-host"></div>
 <script>
