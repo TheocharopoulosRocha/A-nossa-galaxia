@@ -135,29 +135,14 @@ h2 {
 .carta:hover .abrir { transform: translateX(4px); }
 
 
-/* ---------- Playlist ---------- */
-.playlist {
-  display: grid; gap: 14px;
-  padding: 18px; border-radius: 16px;
-  background: linear-gradient(135deg, rgba(200,180,255,.10), rgba(255,211,122,.06));
-  border: 1px solid var(--linha);
-}
-.playlist-cab { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
-.playlist h2 { font-size: clamp(1.6rem, 5vw, 2rem); }
-.playlist .nota { font: 600 1.35rem/1.1 var(--f-mao); color: var(--lua); }
-.playlist iframe { display: block; width: 100%; max-width: 100%; height: 352px; border: 0; border-radius: 12px; background: rgba(0,0,0,.25); }
-.playlist .ouvir {
-  justify-self: start;
-  display: inline-flex; align-items: center; gap: 10px;
-  padding: 11px 18px; border-radius: 999px;
-  background: var(--lua); color: var(--ceu); text-decoration: none;
-  font: 800 15px/1 var(--f-corpo);
-  transition: transform .2s ease, box-shadow .2s ease;
-  box-shadow: 0 8px 22px -10px rgba(255,211,122,.8);
-}
-.playlist .ouvir:hover { transform: translateY(-2px); }
-.playlist .ouvir:focus-visible { outline: 3px solid var(--lilas); outline-offset: 3px; }
-@media (max-width: 520px) { .playlist iframe { height: 232px; } .playlist .ouvir { justify-self: stretch; justify-content: center; } }
+/* ---------- Playlist (discreta, depois das fotos) ---------- */
+.playlist { display: grid; gap: 10px; max-width: 520px; width: 100%; justify-self: center; opacity: .92; }
+.playlist-cab { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 14px; }
+.playlist h2 { font: 600 1.6rem/1 var(--f-mao); color: var(--lua); }
+.playlist iframe { display: block; width: 100%; max-width: 100%; height: 152px; border: 0; border-radius: 12px; background: rgba(0,0,0,.25); }
+.playlist .ouvir { color: var(--texto-suave); font-size: 13px; text-decoration: none; border-bottom: 1px dashed var(--linha); }
+.playlist .ouvir:hover { color: var(--texto); }
+.playlist .ouvir:focus-visible { outline: 2px solid var(--lilas); outline-offset: 3px; border-radius: 2px; }
 
 /* ---------- Mural de fotos ---------- */
 .mural {
@@ -256,14 +241,6 @@ footer small { color: var(--texto-suave); font-size: 13px; }
   </header>
 
 
-  <section class="playlist" aria-labelledby="t-playlist">
-    <div class="playlist-cab">
-      <h2 id="t-playlist">A nossa playlist</h2>
-      <span class="nota">as músicas que contam a gente ♪</span>
-    </div>
-    <iframe title="A nossa playlist no Spotify" src="https://open.spotify.com/embed/playlist/6ZzkbOc64NCQfw5EnpiP4U?utm_source=generator&amp;theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-    <a class="ouvir" href="https://open.spotify.com/playlist/6ZzkbOc64NCQfw5EnpiP4U" target="_blank" rel="noopener">▶ Ouvir no Spotify</a>
-  </section>
 
   <section class="secao" aria-labelledby="t-surpresas">
     <div class="secao-cab">
@@ -279,6 +256,14 @@ footer small { color: var(--texto-suave); font-size: 13px; }
       <p id="fotos-intro">Esse mural ainda está meio vazio. Ele vai enchendo com as fotos que a gente for tirando.</p>
     </div>
     <ul class="mural" id="mural"></ul>
+  </section>
+
+  <section class="playlist" aria-labelledby="t-playlist">
+    <div class="playlist-cab">
+      <h2 id="t-playlist">A nossa playlist</h2>
+      <a class="ouvir" href="https://open.spotify.com/playlist/6ZzkbOc64NCQfw5EnpiP4U" target="_blank" rel="noopener">abrir no Spotify ↗</a>
+    </div>
+    <iframe title="A nossa playlist no Spotify" src="https://open.spotify.com/embed/playlist/6ZzkbOc64NCQfw5EnpiP4U?utm_source=generator&amp;theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
   </section>
 
   <footer>
