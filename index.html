@@ -332,10 +332,17 @@ footer small { color: var(--texto-suave); font-size: 13px; }
     "emoji": "🐱",
     "resumo": "A redação que eu prometi, sobre o quão linda você é aos meus olhos, com gatinho e a nossa música tocando.",
     "cor": "#c9a8ef"
+  },
+  {
+    "id": "carta",
+    "titulo": "Carta pra minha princesa",
+    "emoji": "✉️",
+    "resumo": "O Niko guarda o envelope, a nossa música toca baixinho e tem um pote de saudade pra encher enquanto a gente está longe.",
+    "cor": "#f3a6c8"
   }
 ];
   var FOTOS = (window.NOSSAS_FOTOS || []).filter(function (f) { return f && f.arquivo; });
-  var VAGAS_VAZIAS = 6; // quantos espaços reservados mostrar quando não há fotos
+  var VAGAS_VAZIAS = 6; // o mural sempre mostra pelo menos 6 polaroides (fotos + espaços guardados)
 
   function esc(t) {
     return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) {
@@ -361,24 +368,20 @@ footer small { color: var(--texto-suave); font-size: 13px; }
 
   /* ---- Mural ---- */
   var mural = document.getElementById('mural');
-  if (FOTOS.length) {
-    document.getElementById('fotos-intro').textContent = 'Toque numa foto pra ver maior.';
-    mural.innerHTML = FOTOS.map(function (f, i) {
-      return '<li class="polaroide fita" style="--giro:' + giros[i % giros.length] + 'deg">' +
-        '<button type="button" data-i="' + i + '" aria-label="Ver foto: ' + esc(f.legenda || 'foto ' + (i + 1)) + '">' +
-          '<img src="fotos/' + esc(f.arquivo) + '" alt="' + esc(f.legenda || '') + '" loading="lazy"></button>' +
-        '<div class="legenda">' + esc(f.legenda || '') + (f.data ? '<small>' + esc(f.data) + '</small>' : '') + '</div>' +
-      '</li>';
-    }).join('');
-  } else {
-    var html = '';
-    for (var i = 0; i < VAGAS_VAZIAS; i++) {
-      html += '<li class="polaroide fita" style="--giro:' + giros[i % giros.length] + 'deg">' +
-        '<div class="vazio"><div><span>📷</span>espaço guardado pra uma foto nossa</div></div>' +
-        '<div class="legenda">em breve</div></li>';
-    }
-    mural.innerHTML = html;
+  if (FOTOS.length) document.getElementById('fotos-intro').textContent = 'Toque numa foto pra ver maior. O resto do mural vai enchendo com as próximas que a gente tirar.';
+  var html = FOTOS.map(function (f, i) {
+    return '<li class="polaroide fita" style="--giro:' + giros[i % giros.length] + 'deg">' +
+      '<button type="button" data-i="' + i + '" aria-label="Ver foto: ' + esc(f.legenda || 'foto ' + (i + 1)) + '">' +
+        '<img src="fotos/' + esc(f.arquivo) + '" alt="' + esc(f.legenda || '') + '" loading="lazy"></button>' +
+      '<div class="legenda">' + esc(f.legenda || '') + (f.data ? '<small>' + esc(f.data) + '</small>' : '') + '</div>' +
+    '</li>';
+  }).join('');
+  for (var i = FOTOS.length; i < Math.max(VAGAS_VAZIAS, FOTOS.length); i++) {
+    html += '<li class="polaroide fita" style="--giro:' + giros[i % giros.length] + 'deg">' +
+      '<div class="vazio"><div><span>📷</span>espaço guardado pra uma foto nossa</div></div>' +
+      '<div class="legenda">em breve</div></li>';
   }
+  mural.innerHTML = html;
 
   /* ---- Visor de foto ---- */
   var visor = document.getElementById('visor'), vImg = document.getElementById('visor-img'),
