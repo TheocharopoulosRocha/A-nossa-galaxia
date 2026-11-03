@@ -10,8 +10,8 @@
    ============================================================ */
 
 window.NOSSAS_FOTOS = [
-  { arquivo: "primeira-foto-juntos.jpg", legenda: "Nossa primeira foto juntos", data: "" },
-  { arquivo: "nos-dois-de-lado.jpg", legenda: "", data: "", horizontal: true },
+  { arquivo: "primeira-foto-juntos.jpg", legenda: "Nossa primeira foto juntos 18/10", data: "" },
+  { arquivo: "nos-dois-de-lado.jpg", legenda: "31/10", data: "", horizontal: true },
   // { arquivo: "primeiro-encontro.jpg", legenda: "Nosso primeiro encontro", data: "out/2026" },
   // { arquivo: "chamada-de-video.jpg",  legenda: "Rindo de nada às 2h da manhã", data: "" },
 ];
