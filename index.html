@@ -148,6 +148,7 @@ h2 {
 .mural {
   list-style: none; margin: 0; padding: 0;
   display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 22px 18px;
+  grid-auto-flow: dense;
 }
 .polaroide {
   background: #fbf8f2; color: var(--tinta);
@@ -165,6 +166,8 @@ h2 {
 .polaroide img, .vazio {
   display: block; width: 100%; max-width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 2px;
 }
+.polaroide.deitada { grid-column: span 2; }
+.polaroide.deitada img { aspect-ratio: 16 / 9; }
 .vazio {
   display: grid; place-items: center; text-align: center; padding: 12px;
   background:
@@ -339,6 +342,13 @@ footer small { color: var(--texto-suave); font-size: 13px; }
     "emoji": "✉️",
     "resumo": "O Niko guarda o envelope, a nossa música toca baixinho e tem um pote de saudade pra encher enquanto a gente está longe.",
     "cor": "#f3a6c8"
+  },
+  {
+    "id": "um-mes",
+    "titulo": "O Fio do Niko",
+    "emoji": "🧶",
+    "resumo": "Um mês daquele 3 de outubro: dá o play e segue o fio de lã até o final da carta.",
+    "cor": "#ff8fc4"
   }
 ];
   var FOTOS = (window.NOSSAS_FOTOS || []).filter(function (f) { return f && f.arquivo; });
@@ -370,7 +380,7 @@ footer small { color: var(--texto-suave); font-size: 13px; }
   var mural = document.getElementById('mural');
   if (FOTOS.length) document.getElementById('fotos-intro').textContent = 'Toque numa foto pra ver maior. O resto do mural vai enchendo com as próximas que a gente tirar.';
   var html = FOTOS.map(function (f, i) {
-    return '<li class="polaroide fita" style="--giro:' + giros[i % giros.length] + 'deg">' +
+    return '<li class="polaroide fita' + (f.horizontal ? ' deitada' : '') + '" style="--giro:' + giros[i % giros.length] + 'deg">' +
       '<button type="button" data-i="' + i + '" aria-label="Ver foto: ' + esc(f.legenda || 'foto ' + (i + 1)) + '">' +
         '<img src="fotos/' + esc(f.arquivo) + '" alt="' + esc(f.legenda || '') + '" loading="lazy"></button>' +
       '<div class="legenda">' + esc(f.legenda || '') + (f.data ? '<small>' + esc(f.data) + '</small>' : '') + '</div>' +
