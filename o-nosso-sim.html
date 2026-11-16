@@ -93,7 +93,7 @@ body {
 }
 .env-fundo { position: absolute; inset: 0; background: #e9c9c3; border-radius: 6px; }
 .env-papel {
-  position: absolute; left: 7%; right: 7%; top: 8%; height: 84%; box-sizing: border-box;
+  position: absolute; left: 7%; right: 7%; top: 8%; height: 84%; box-sizing: border-box; z-index: 1;
   background: var(--paper); border-radius: 3px;
   box-shadow: 0 0 0 1px var(--paper-edge) inset;
   transition: transform 1.3s cubic-bezier(.3,.7,.2,1) .7s;
@@ -101,12 +101,10 @@ body {
 }
 .env-papel span { display: block; height: 3px; width: 70%; background: #eadfce; border-radius: 2px; }
 .env-papel span:nth-child(2) { width: 58%; } .env-papel span:nth-child(3) { width: 64%; }
-.env-bolso {
-  position: absolute; inset: 0; border-radius: 6px; z-index: 2;
-  background:
-    linear-gradient(to top right, #f1d6d0 49.6%, transparent 50%) left bottom / 50.4% 100% no-repeat,
-    linear-gradient(to top left,  #f1d6d0 49.6%, transparent 50%) right bottom / 50.4% 100% no-repeat,
-    linear-gradient(to top, #ecd0ca 0%, #ecd0ca 100%) bottom / 100% 0 no-repeat;
+.env-bolso { position: absolute; inset: 0; border-radius: 6px; z-index: 2; }
+.env-bolso::before { /* frente do envelope: cobre tudo menos o triângulo da aba, sem frestas */
+  content: ""; position: absolute; inset: 0; border-radius: 6px; background: #f1d6d0;
+  clip-path: polygon(0 0, 50% 60%, 100% 0, 100% 100%, 0 100%);
 }
 .env-bolso::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 58%;
@@ -134,6 +132,7 @@ body {
   font-family: var(--font-script); font-size: 34px; color: #f0c9b4; line-height: 1;
   transition: transform .5s ease, opacity .5s ease;
 }
+.selo .letra { display: block; transform: translate(-6.5px, 5.1px); } /* o V manuscrito tem o traço deslocado; isto o centraliza no selo */
 .selo::after { content: ""; position: absolute; inset: 7px; border-radius: 50%; border: 1px dashed rgba(240,201,180,.35); }
 .aberto .selo { transform: scale(1.25) rotate(-10deg); opacity: 0; }
 .aberto .env-aba { transform: rotateX(180deg); z-index: 0; }
@@ -267,7 +266,7 @@ body {
       <div class="env-fundo"></div>
       <div class="env-papel"><span></span><span></span><span></span></div>
       <div class="env-bolso"></div>
-      <div class="env-aba"><div class="selo">V</div></div>
+      <div class="env-aba"><div class="selo"><span class="letra">V</span></div></div>
     </div>
     <button class="botao" id="abrir" type="button">Abrir a carta</button>
     <p class="dica">Leia com calma. As palavras vão aparecendo devagar.</p>
