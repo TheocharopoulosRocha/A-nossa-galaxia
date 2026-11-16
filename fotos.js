@@ -12,7 +12,7 @@
 window.NOSSAS_FOTOS = [
   { arquivo: "primeira-foto-juntos.jpg", legenda: "Nossa primeira foto juntos 18/10", data: "" },
   { arquivo: "nos-dois-de-lado.jpg", legenda: "31/10", data: "", horizontal: true },
-   { arquivo: "primeira-foto-namorados.jpg", legenda: "A primeira foto como namorados", data: "" },
+   { arquivo: "primeira-foto-namorados.jpg", legenda: "A primeira foto como namorados 15/11", data: "" },
    { arquivo: "aliancas-15-11.jpg", legenda: "💍💍15/11", data: "" },
   // { arquivo: "primeiro-encontro.jpg", legenda: "Nosso primeiro encontro", data: "out/2026" },
   // { arquivo: "chamada-de-video.jpg",  legenda: "Rindo de nada às 2h da manhã", data: "" },
